@@ -19,10 +19,6 @@ get_admin_sheet <- function(osf_file_id = "z8kpa") {
                                     private = TRUE) %>%
     readxl::read_xlsx()
 
-  add_none <- admin_dat %>%
-    mutate(variables = paste0("None (Journal & Images Only)", ", ", variables)) %>%
-    mutate(units_of_measurement = paste0("None (Journal & Images Only)", ", ", units_of_measurement))
-
   # Clean data
   test <- add_none %>%
     mutate(treatments = str_split(treatments, ",")) %>%
