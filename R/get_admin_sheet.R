@@ -20,7 +20,7 @@ get_admin_sheet <- function(osf_file_id = "z8kpa") {
     readxl::read_xlsx()
 
   # Clean data
-  test <- add_none %>%
+  test <- admin_dat %>%
     mutate(treatments = str_split(treatments, ",")) %>%
     unnest() %>%
     mutate(variables = str_split(variables, ",")) %>%
