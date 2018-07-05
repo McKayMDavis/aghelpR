@@ -6,9 +6,7 @@
 #'
 #' @return NULL - Only prints a statement welcoming user to OSF
 #'
-#' @example
-#' login_to_osf()
-#'
+#' @export login_to_osf
 login_to_osf <- function(osf_pat = readr::read_lines("www/PAT")) {
   osfr::login(pat = osf_pat)
   osfr::welcome()
