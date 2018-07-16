@@ -22,6 +22,8 @@ move_to_projects <- function(id, year) {
       current_files[[i]] <- files_dict[[i]]
     }
   }
+  len <- length(current_files)
+  cur <- 1
 
   # Move files
   for (j in names(project_components)) {
@@ -37,6 +39,8 @@ move_to_projects <- function(id, year) {
         } else {
           move(files = current_files, folders = folders_dict, file_name = k, folder_name = "Pictures")
         }
+        print(paste0(cur, "/", len))
+        cur <- cur + 1
       }
     }
   }
