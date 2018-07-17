@@ -11,11 +11,13 @@ download_all <- function(id = "judwb", path = getwd()) {
 
   j <- 1
 
-  for (i in links) {
-    httr::GET(i, config = get_config(TRUE),
-              httr::write_disk(path, overwrite = TRUE))
+  message("Downloading files:")
+  for (i in 1:length(links$link)) {
+    f_path <- paste0(path, "/", links$name[[i]])
+    httr::GET(links$link[[i]], config = get_config(TRUE),
+              httr::write_disk(f_path, overwrite = TRUE))
 
-    cat(j, "/", length(links), "\n")
+    cat(j, "/", length(links$link), "\n")
     j <- j + 1
   }
 }

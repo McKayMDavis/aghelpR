@@ -85,10 +85,14 @@ move <- function(files, folders, file_name, folder_name) {
 #' @export get_all_file_links
 
 get_all_file_links <- function(id = "judwb") {
-  file_links <- vector(mode = "list")
+  file_links <- data.frame(link = rep(NA, 20000),
+                           name = NA)
 
-  dict <- aghelpR::concoct_directory(id)
+  message("Building dictionary")
+  dict <- suppressMessages(aghelpR::concoct_directory(id))
 
+  o <- 1
+  message("Issuing requests:")
   for (i in seq_along(dict$data)) {
     for (j in dict$data[[i]]$attributes$title) {
       for (k in seq_along(dict$components[[j]]$data)) {
@@ -97,11 +101,13 @@ get_all_file_links <- function(id = "judwb") {
 
           # Issue request
           if (!is.null(file_url)) {
-            req <- httr::GET(file_url, config = aghelpR::get_config(TRUE))
+            req <- httr::GET(file_url, config = get_config(TRUE))
             res <- rjson::fromJSON(httr::content(req, 'text', encoding = "UTF-8"))
             for (m in seq_along(res$data)) {
-              file_links <- c(file_links,
-                              res$data[[m]]$links$download)
+              file_links$link[o] <- res$data[[m]]$links$download
+              file_links$name[o] <- res$data[[m]]$attributes$name
+              message(o)
+              o <- o + 1
             }
           }
         }
@@ -109,5 +115,6 @@ get_all_file_links <- function(id = "judwb") {
     }
   }
 
+  file_links <- subset(file_links, !is.na(file_links$link))
   return(file_links)
 }
