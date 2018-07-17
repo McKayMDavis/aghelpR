@@ -76,3 +76,38 @@ move <- function(files, folders, file_name, folder_name) {
   httr::GET(files[[file_name]], config = get_config(TRUE), httr::write_disk(path, overwrite = TRUE))
   httr::PUT(to_folder_url, config = get_config(TRUE), body = httr::upload_file(path))
 }
+
+
+#' Get all file links from project
+#'
+#' @param id OSF id. Defaults to main Ag project.
+#'
+#' @export get_all_file_links
+
+get_all_file_links <- function(id = "judwb") {
+  file_links <- vector(mode = "list")
+
+  dict <- aghelpR::concoct_directory(id)
+
+  for (i in seq_along(dict$data)) {
+    for (j in dict$data[[i]]$attributes$title) {
+      for (k in seq_along(dict$components[[j]]$data)) {
+        for (l in dict$components[[j]]$data[[k]]$attributes$title) {
+          file_url <- dict$components[[j]]$files[[l]]$data[[1]]$relationships$files$links$related$href
+
+          # Issue request
+          if (!is.null(file_url)) {
+            req <- httr::GET(file_url, config = aghelpR::get_config(TRUE))
+            res <- rjson::fromJSON(httr::content(req, 'text', encoding = "UTF-8"))
+            for (m in seq_along(res$data)) {
+              file_links <- c(file_links,
+                              res$data[[m]]$links$download)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return(file_links)
+}
