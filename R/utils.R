@@ -109,7 +109,7 @@ get_all_file_links <- function(id = "judwb") {
               file_links$link[o] <- res$data[[m]]$links$download
               file_links$name[o] <- gsub(" ", "_", res$data[[m]]$attributes$name)
               file_links$year[o] <- j
-              file_links$project[o] <- l
+              file_links$project[o] <- gsub(" ", "_", l)
               message(o)
               o <- o + 1
             }
