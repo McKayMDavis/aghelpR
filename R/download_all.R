@@ -40,14 +40,14 @@ download_all <- function(download_local = FALSE, id = "judwb", path = getwd()) {
       if (stringr::str_detect(links$name[[i]], ".csv")) {
         # Read the file to unique name
         f_name <- gsub(".csv", "", links$name[[i]])
-        df_list[[f_name]] <- suppressMessages(read_csv(f_path))
+        df_list[[f_name]] <- suppressMessages(readr::read_csv(f_path))
       } else if (stringr::str_detect(links$name[[i]], ".xlsx")) {
         # Read the file to unique name
         f_name <- gsub(".xlsx", "", links$name[[i]])
-        df_list[[f_name]] <- read_xlsx(f_path)
+        df_list[[f_name]] <- readxl::read_xlsx(f_path)
       } else if (stringr::str_detect(links$name[[i]], ".xls")) {
         f_name <- gsub(".xls", "", links$name[[i]])
-        df_list[[f_name]] <- read_xls(f_path)
+        df_list[[f_name]] <- readxl::read_xls(f_path)
       } else {
         message(paste("File",
                       links$name[[i]],
