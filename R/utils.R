@@ -105,7 +105,13 @@ get_all_file_links <- function(id = "judwb") {
             res <- rjson::fromJSON(httr::content(req, 'text', encoding = "UTF-8"))
             for (m in seq_along(res$data)) {
               file_links$link[o] <- res$data[[m]]$links$download
-              file_links$name[o] <- gsub(" ", "_", res$data[[m]]$attributes$name)
+
+              file_links$name[o] <- paste0(
+                gsub(" ", "_", res$data[[m]]$attributes$name),
+                "_YEAR=",
+                j,
+                "_PROJECT=",
+                l)
               message(o)
               o <- o + 1
             }
