@@ -86,7 +86,9 @@ move <- function(files, folders, file_name, folder_name) {
 
 get_all_file_links <- function(id = "judwb") {
   file_links <- data.frame(link = rep(NA, 20000),
-                           name = NA)
+                           name = NA,
+                           year = NA,
+                           project = NA)
 
   message("Building dictionary")
   dict <- suppressMessages(aghelpR::concoct_directory(id))
@@ -105,13 +107,9 @@ get_all_file_links <- function(id = "judwb") {
             res <- rjson::fromJSON(httr::content(req, 'text', encoding = "UTF-8"))
             for (m in seq_along(res$data)) {
               file_links$link[o] <- res$data[[m]]$links$download
-
-              file_links$name[o] <- paste0(
-                gsub(" ", "_", res$data[[m]]$attributes$name),
-                "_YEAR=",
-                j,
-                "_PROJECT=",
-                l)
+              file_links$name[o] <- gsub(" ", "_", res$data[[m]]$attributes$name)
+              file_links$year[o] <- j
+              file_links$project[o] <- l
               message(o)
               o <- o + 1
             }
