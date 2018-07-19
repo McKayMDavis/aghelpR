@@ -99,19 +99,32 @@ get_all_file_links <- function(id = "judwb") {
     for (j in dict$data[[i]]$attributes$title) {
       for (k in seq_along(dict$components[[j]]$data)) {
         for (l in dict$components[[j]]$data[[k]]$attributes$title) {
-          file_url <- dict$components[[j]]$files[[l]]$data[[1]]$relationships$files$links$related$href
+          # Files stored differently in different years
+          if (j %in% c("2014", "2015", "2017")) {
+            for (m in seq_along(dict$components[[j]]$files[[l]]$data)) {
+              if (!is.null(dict$components[[j]]$files[[l]]$data[[m]]$links$download)) {
+                file_links$link[o] <- dict$components[[j]]$files[[l]]$data[[m]]$links$download
+                file_links$name[o] <- gsub(" ", "_",
+                                           dict$components[[j]]$files[[l]]$data[[m]]$attributes$name)
+                file_links$year[o] <- j
+                file_links$project[o] <- gsub(" ", "_", l)
+                o <- o + 1
+              }
+            }
+          } else {
+            file_url <- dict$components[[j]]$files[[l]]$data[[1]]$relationships$files$links$related$href
 
-          # Issue request
-          if (!is.null(file_url)) {
-            req <- httr::GET(file_url, config = get_config(TRUE))
-            res <- rjson::fromJSON(httr::content(req, 'text', encoding = "UTF-8"))
-            for (m in seq_along(res$data)) {
-              file_links$link[o] <- res$data[[m]]$links$download
-              file_links$name[o] <- gsub(" ", "_", res$data[[m]]$attributes$name)
-              file_links$year[o] <- j
-              file_links$project[o] <- gsub(" ", "_", l)
-              message(o)
-              o <- o + 1
+            if (!is.null(file_url)) {
+              req <- httr::GET(file_url, config = get_config(TRUE))
+              res <- rjson::fromJSON(httr::content(req, 'text', encoding = "UTF-8"))
+              for (m in seq_along(res$data)) {
+                file_links$link[o] <- res$data[[m]]$links$download
+                file_links$name[o] <- gsub(" ", "_", res$data[[m]]$attributes$name)
+                file_links$year[o] <- j
+                file_links$project[o] <- gsub(" ", "_", l)
+                message(o)
+                o <- o + 1
+              }
             }
           }
         }
@@ -122,3 +135,4 @@ get_all_file_links <- function(id = "judwb") {
   file_links <- subset(file_links, !is.na(file_links$link))
   return(file_links)
 }
+

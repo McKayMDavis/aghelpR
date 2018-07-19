@@ -10,21 +10,29 @@
 
 concoct_directory <- function(id) {
 
-  children <- osfr::get_nodes(id = id, children = TRUE, private = TRUE)
+  children <- suppressMessages(osfr::get_nodes(id = id,
+                                               children = TRUE,
+                                               private = TRUE))
 
   for (i in seq_along(children$data)) {
     if (length(children$data) != 0) {
       index <- children$data[[i]]$attributes$title
-      children[["components"]][[index]] <- osfr::get_nodes(children$data[[i]]$id,
-                                                           children = TRUE,
-                                                           private = TRUE)
+      children[["components"]][[index]] <- suppressMessages(
+        osfr::get_nodes(children$data[[i]]$id,
+                        children = TRUE,
+                        private = TRUE)
+      )
 
       # This works but not quite how we want
-      children[["files"]][[index]] <- osfr::get_nodes(children$data[[i]]$id,
-                                                           files = TRUE,
-                                                           private = TRUE)
+      children[["files"]][[index]] <- suppressMessages(
+        osfr::get_nodes(children$data[[i]]$id,
+                        files = TRUE,
+                        private = TRUE)
+      )
 
       children[["components"]][[index]] <- concoct_directory(children$data[[i]]$id)
+
+      cat(".")
     }
   }
 
