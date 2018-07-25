@@ -73,8 +73,12 @@ move <- function(files, folders, file_name, folder_name) {
   path <- paste0(tempdir(), "/", file_name)
   to_folder_url <- paste0(folders[[folder_name]], "?kind=file&name=", file_name)
 
-  httr::GET(files[[file_name]], config = get_config(TRUE), httr::write_disk(path, overwrite = TRUE))
-  httr::PUT(to_folder_url, config = get_config(TRUE), body = httr::upload_file(path))
+
+
+  get_req <- httr::GET(files[[file_name]], config = get_config(TRUE), httr::write_disk(path, overwrite = TRUE))
+  cat("GET Code:", get_req$status_code, "\n")
+  put_req <- httr::PUT(to_folder_url, config = get_config(TRUE), body = httr::upload_file(path))
+  cat("PUT Code:", put_req$status_code, "\n")
 }
 
 
@@ -91,28 +95,33 @@ get_all_file_links <- function(id = "judwb") {
                            project = NA)
 
   message("Building dictionary")
-  dict <- suppressMessages(aghelpR::concoct_directory(id))
+  if (exists("get_file_dict", envir = .GlobalEnv)) {
+    get_file_dict <- get("get_file_dict", envir = .GlobalEnv)
+  } else {
+    get_file_dict <- suppressMessages(aghelpR::concoct_directory(id))
+    get_file_dict <<- get_file_dict
+  }
 
   o <- 1
   message("Issuing requests:")
-  for (i in seq_along(dict$data)) {
-    for (j in dict$data[[i]]$attributes$title) {
-      for (k in seq_along(dict$components[[j]]$data)) {
-        for (l in dict$components[[j]]$data[[k]]$attributes$title) {
+  for (i in seq_along(get_file_dict$data)) {
+    for (j in get_file_dict$data[[i]]$attributes$title) {
+      for (k in seq_along(get_file_dict$components[[j]]$data)) {
+        for (l in get_file_dict$components[[j]]$data[[k]]$attributes$title) {
           # Files stored differently in different years
           if (j %in% c("2014", "2015", "2017")) {
-            for (m in seq_along(dict$components[[j]]$files[[l]]$data)) {
-              if (!is.null(dict$components[[j]]$files[[l]]$data[[m]]$links$download)) {
-                file_links$link[o] <- dict$components[[j]]$files[[l]]$data[[m]]$links$download
+            for (m in seq_along(get_file_dict$components[[j]]$files[[l]]$data)) {
+              if (!is.null(get_file_dict$components[[j]]$files[[l]]$data[[m]]$links$download)) {
+                file_links$link[o] <- get_file_dict$components[[j]]$files[[l]]$data[[m]]$links$download
                 file_links$name[o] <- gsub(" ", "_",
-                                           dict$components[[j]]$files[[l]]$data[[m]]$attributes$name)
+                                           get_file_dict$components[[j]]$files[[l]]$data[[m]]$attributes$name)
                 file_links$year[o] <- j
                 file_links$project[o] <- gsub(" ", "_", l)
                 o <- o + 1
               }
             }
           } else {
-            file_url <- dict$components[[j]]$files[[l]]$data[[1]]$relationships$files$links$related$href
+            file_url <- get_file_dict$components[[j]]$files[[l]]$data[[1]]$relationships$files$links$related$href
 
             if (!is.null(file_url)) {
               req <- httr::GET(file_url, config = get_config(TRUE))
@@ -131,8 +140,9 @@ get_all_file_links <- function(id = "judwb") {
       }
     }
   }
-
+  # 1-174 works 175, 176 bad
   file_links <- subset(file_links, !is.na(file_links$link))
+  file_links <- file_links
   return(file_links)
 }
 

@@ -5,7 +5,7 @@
 #' @param year The current year component or year component to which file moving is desired
 #' @export move_to_projects
 
-move_to_projects <- function(id, year) {
+move_to_projects <- function(id = "judwb", year) {
   # Get current year's component, then get the project components (children) dictionary of that component
   all_child_components <- get_dictionary(id = id, type = "children")
   working_child_id <- all_child_components[[year]]
@@ -31,6 +31,7 @@ move_to_projects <- function(id, year) {
       if (stringr::str_detect(k, stringr::str_replace_all(j,
                                                  "[^[:alnum:]]",
                                                  ""))) {
+        cat(k, "in project", j, ":", "\n")
         folders_dict <- get_dictionary(id = project_components[[j]], type = "folders")
         if (stringr::str_detect(k, ".csv")) {
           move(files = current_files, folders = folders_dict, file_name = k, folder_name = "Data")
@@ -39,7 +40,7 @@ move_to_projects <- function(id, year) {
         } else {
           move(files = current_files, folders = folders_dict, file_name = k, folder_name = "Pictures")
         }
-        print(paste0(cur, "/", len))
+        cat(cur, "/", len, "\n")
         cur <- cur + 1
       }
     }

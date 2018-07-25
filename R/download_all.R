@@ -37,41 +37,42 @@ download_all <- function(download_local = FALSE, id = "judwb", path = getwd()) {
       httr::GET(links$link[[i]], config = get_config(TRUE),
                 httr::write_disk(f_path, overwrite = TRUE))
 
-      if (stringr::str_detect(links$name[[i]], ".csv")) {
-        # Read the file to unique name
-        f_name <- paste0(
-          gsub(".csv", "", links$name[[i]]),
-          "_YEAR=",
-          links$year[[i]],
-          "_PROJECT=",
-          links$project[[i]]
-        )
-        df_list[[f_name]] <- suppressMessages(readr::read_csv(f_path))
-      } else if (stringr::str_detect(links$name[[i]], ".xlsx")) {
-        # Read the file to unique name
-        f_name <- paste0(
-          gsub(".xlsx", "", links$name[[i]]),
-          "_YEAR=",
-          links$year[[i]],
-          "_PROJECT=",
-          links$project[[i]]
-        )
-        df_list[[f_name]] <- readxl::read_xlsx(f_path)
-      } else if (stringr::str_detect(links$name[[i]], ".xls")) {
-        f_name <- paste0(
-          gsub(".xls", "", links$name[[i]]),
-          "_YEAR=",
-          links$year[[i]],
-          "_PROJECT=",
-          links$project[[i]]
-        )
-        df_list[[f_name]] <- readxl::read_xls(f_path)
-      } else {
-        message(paste("File",
-                      links$name[[i]],
-                      "not read in due to unused file extension."))
-      }
-
+      tryCatch({
+        if (stringr::str_detect(links$name[[i]], ".csv")) {
+          # Read the file to unique name
+          f_name <- paste0(
+            gsub(".csv", "", links$name[[i]]),
+            "_YEAR=",
+            links$year[[i]],
+            "_PROJECT=",
+            links$project[[i]]
+          )
+          df_list[[f_name]] <- suppressMessages(readr::read_csv(f_path))
+        } else if (stringr::str_detect(links$name[[i]], ".xlsx")) {
+          # Read the file to unique name
+          f_name <- paste0(
+            gsub(".xlsx", "", links$name[[i]]),
+            "_YEAR=",
+            links$year[[i]],
+            "_PROJECT=",
+            links$project[[i]]
+          )
+          df_list[[f_name]] <- readxl::read_xlsx(f_path)
+        } else if (stringr::str_detect(links$name[[i]], ".xls")) {
+          f_name <- paste0(
+            gsub(".xls", "", links$name[[i]]),
+            "_YEAR=",
+            links$year[[i]],
+            "_PROJECT=",
+            links$project[[i]]
+          )
+          df_list[[f_name]] <- readxl::read_xls(f_path)
+        } else {
+          message(paste("File",
+                        links$name[[i]],
+                        "not read in due to unused file extension."))
+        }
+      }, error = function(e){})
       cat(j, "/", length(links$link), "\n")
       j <- j + 1
     }
