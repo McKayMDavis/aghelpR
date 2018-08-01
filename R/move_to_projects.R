@@ -10,7 +10,8 @@ move_to_projects <- function(id = "judwb", year) {
   all_child_components <- get_dictionary(id = id, type = "children")
   working_child_id <- all_child_components[[year]]
   project_components <- get_dictionary(id = working_child_id, type = "children")
-
+  # NEED A WAY TO GET DELETE LINKS TO PASS TO MOVE FILES
+  # NEED TO get_nodes ON TO COMPONENT ID
   # Get dictionary of files for current year
   data_component_id <- all_child_components[["Data"]]
   raw_data_component <- get_dictionary(id = data_component_id, type = "children")
@@ -32,6 +33,24 @@ move_to_projects <- function(id = "judwb", year) {
                                                  "[^[:alnum:]]",
                                                  ""))) {
         cat(k, "in project", j, ":", "\n")
+        # HERE
+        # Might need to issue GET requests to grab info on the files in the project components.
+        proj_current <- get_dictionary(project_components[[j]], type = "files")
+        for (l in names(proj_current)) {
+          if (l %in% c("Data", "Journal", "Pictures")) {
+            req <- httr::GET(proj_current[[l]], config = get_config(TRUE))
+            res <- rjson::fromJSON(httr::content(req, 'text', encoding = "UTF-8"))
+            for (m in seq_along(res$data)) {
+              if (!is.null(res$data[[m]]$attributes$name)) {
+                if (k == res$data[[m]]$attributes$name) {
+                  httr::DELETE(res$data[[m]]$links$delete, config = get_config(TRUE))
+                  cat("FILE: ", k, " DELETED\n")
+                }
+              }
+            }
+          }
+        }
+
         folders_dict <- get_dictionary(id = project_components[[j]], type = "folders")
         if (stringr::str_detect(k, ".csv")) {
           move(files = current_files, folders = folders_dict, file_name = k, folder_name = "Data")
