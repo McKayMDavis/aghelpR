@@ -29,9 +29,10 @@ move_to_projects <- function(id = "judwb", year) {
   # Move files
   for (j in names(project_components)) {
     for (k in names(current_files)) {
-      if (stringr::str_detect(k, stringr::str_replace_all(j,
-                                                 "[^[:alnum:]]",
-                                                 ""))) {
+      if (stringr::str_detect(tolower(k),
+                              tolower(stringr::str_replace_all(j,
+                                                               "[^[:alnum:]]",
+                                                               "")))) {
         cat(k, "in project", j, ":", "\n")
         # HERE
         # Might need to issue GET requests to grab info on the files in the project components.

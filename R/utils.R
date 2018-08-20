@@ -79,6 +79,9 @@ move <- function(files, folders, file_name, folder_name) {
   cat("GET Code:", get_req$status_code, "\n")
   put_req <- httr::PUT(to_folder_url, config = get_config(TRUE), body = httr::upload_file(path))
   cat("PUT Code:", put_req$status_code, "\n")
+  if (put_req$status_code != "201") {
+    warning(paste0("PUT code for file ", file_name, " returned ", put_req$status_code))
+  }
 }
 
 
