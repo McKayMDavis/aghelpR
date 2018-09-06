@@ -12,7 +12,7 @@
 # NEED TO:
 # 3. Then reupload files
 # 4. Add a "name" variable to allow user to upload a file by name/project/whatever
-move_to_projects <- function(id = "judwb", year, from = 1, to) {
+move_to_projects <- function(id = "judwb", year, from = 1, to = 0) {
   cat("Setting up. Please wait (This could take a couple minutes).\n")
   # Get current year's component, then get the project components (children) dictionary of that component
   all_child_components <- suppressMessages(get_dictionary(id = id, type = "children"))
@@ -34,7 +34,7 @@ move_to_projects <- function(id = "judwb", year, from = 1, to) {
   len <- length(current_files)
   cur <- from
 
-  if (to) {
+  if (to > 0) {
     len_cur <- c(from:to)
   } else {
     len_cur <- c(from:len)
