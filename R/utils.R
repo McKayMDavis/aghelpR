@@ -67,9 +67,11 @@ get_dictionary <- function(id, type) {
 #' @param file_name Name of the file to be moved
 #'
 #' @param folder_name Name of the folder that gets the moved file
+#'
+#' @param file_num The number of the file for use when a warning displays a file that has not correctly been pushed to OSF.
 #' @export move
 
-move <- function(files, folders, file_name, folder_name) {
+move <- function(files, folders, file_name, folder_name, file_num) {
   path <- paste0(tempdir(), "/", file_name)
   to_folder_url <- paste0(folders[[folder_name]], "?kind=file&name=", file_name)
 
@@ -80,7 +82,12 @@ move <- function(files, folders, file_name, folder_name) {
   put_req <- httr::PUT(to_folder_url, config = get_config(TRUE), body = httr::upload_file(path))
   cat("PUT Code:", put_req$status_code, "\n")
   if (put_req$status_code != "201") {
-    warning(paste0("PUT code for file ", file_name, " returned ", put_req$status_code))
+    warning(paste0("PUT code for file ",
+                   file_name,
+                   " returned ",
+                   put_req$status_code,
+                   crayon::green(".\n FILE NUMBER: "),
+                   crayon::green$bold(file_num)))
   }
 }
 

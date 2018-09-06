@@ -4,7 +4,7 @@
 \alias{move}
 \title{Move a file from one location to another using WaterButler links.}
 \usage{
-move(files, folders, file_name, folder_name)
+move(files, folders, file_name, folder_name, file_num)
 }
 \arguments{
 \item{files}{A dictionary of key = file names and value = Waterbutler link}
@@ -14,6 +14,8 @@ move(files, folders, file_name, folder_name)
 \item{file_name}{Name of the file to be moved}
 
 \item{folder_name}{Name of the folder that gets the moved file}
+
+\item{file_num}{The number of the file for use when a warning displays a file that has not correctly been pushed to OSF.}
 }
 \description{
 Move a file from one location to another using WaterButler links.

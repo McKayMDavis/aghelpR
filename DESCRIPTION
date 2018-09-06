@@ -11,5 +11,6 @@ Imports: stringr,
     httr,
     rjson,
     readxl,
-    readr
+    readr,
+    crayon
 Suggests: osfr

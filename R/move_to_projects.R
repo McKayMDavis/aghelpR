@@ -5,9 +5,14 @@
 #' @param year The current year component or year component to which file moving is desired
 #'
 #' @param from The file number from which the user wishes to begin. Defaults to the first file in the data folder.
+#'
+#' @param to The file number that we want to end the file moving process on. Defaults to the last file in the data folder. Useful to change if warnings indicate files that failed to upload.
 #' @export move_to_projects
 
-move_to_projects <- function(id = "judwb", year, from = 1) {
+# NEED TO:
+# 3. Then reupload files
+# 4. Add a "name" variable to allow user to upload a file by name/project/whatever
+move_to_projects <- function(id = "judwb", year, from = 1, to) {
   cat("Setting up. Please wait (This could take a couple minutes).\n")
   # Get current year's component, then get the project components (children) dictionary of that component
   all_child_components <- suppressMessages(get_dictionary(id = id, type = "children"))
@@ -29,9 +34,15 @@ move_to_projects <- function(id = "judwb", year, from = 1) {
   len <- length(current_files)
   cur <- from
 
+  if (to) {
+    len_cur <- c(from:to)
+  } else {
+    len_cur <- c(from:len)
+  }
+
   # Move files
   for (j in names(project_components)) {
-    for (k in c(from:length(current_files))) {
+    for (k in len_cur) {
       l <- names(current_files[k])
       if (stringr::str_detect(tolower(l),
                               tolower(stringr::str_replace_all(j,
@@ -58,11 +69,23 @@ move_to_projects <- function(id = "judwb", year, from = 1) {
 
         folders_dict <- get_dictionary(id = project_components[[j]], type = "folders")
         if (stringr::str_detect(l, ".csv")) {
-          move(files = current_files, folders = folders_dict, file_name = l, folder_name = "Data")
+          move(files = current_files,
+               folders = folders_dict,
+               file_name = l,
+               folder_name = "Data",
+               file_num = k)
         } else if (stringr::str_detect(l, ".txt")) {
-          move(files = current_files, folders = folders_dict, file_name = l, folder_name = "Journal")
+          move(files = current_files,
+               folders = folders_dict,
+               file_name = l,
+               folder_name = "Journal",
+               file_num = k)
         } else {
-          move(files = current_files, folders = folders_dict, file_name = l, folder_name = "Pictures")
+          move(files = current_files,
+               folders = folders_dict,
+               file_name = l,
+               folder_name = "Pictures",
+               file_num = k)
         }
         cat(cur, "/", len, "\n")
         cur <- cur + 1
